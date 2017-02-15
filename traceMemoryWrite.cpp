@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 {
 	if (PIN_Init(argc, argv)) return Usage();
 
-    trace = fopen("pinatrace.out", "w");
+    trace = fopen("traceMemoryWrite.out", "w");
 
     INS_AddInstrumentFunction(Instruction, 0);
     PIN_AddFiniFunction(Fini, 0);
