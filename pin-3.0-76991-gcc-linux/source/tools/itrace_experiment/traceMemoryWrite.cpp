@@ -27,23 +27,30 @@ VOID Instruction(INS ins, VOID *v)
 	// the instrumentation is called iff the instruction will actually
 	// be executed.
 
-	//UINT32 memOperands = INS_MemoryOperandCount(ins);
+	UINT32 memOperands = INS_OperandCount(ins);
 
 	// Iterate over each memory operand of the instuction.
-	cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<endl;
-	/*for(UINT32 memOp = 0; memOp <memOperands; memOp++)
-	{
-		if(INS_MemoryOperandIsWritten(ins, memOp))
+	for(UINT32 memOp = 0; memOp <memOperands; memOp++)
+	{	
+		if(INS_MemoryOperandIsWritten(ins,memOp)&&(INS_OperandIsImmediate(ins, memOp)))
+		//if(INS_OperandIsImmediate(ins,memOp))
 		{
-			INS_InsertPredicatedCall(
+			//ADDRINT value = INS_OperandImmediate(ins,memOp);
+			
+			
+			/*INS_InsertCall(
 				ins, IPOINT_BEFORE,(AFUNPTR)RecordMemoryWrite,
 				IARG_ADDRINT,INS_Address(ins),//Address of instruction
 				IARG_PTR,new string(INS_Diassemble(ins)),//Disassembly type listing of instruction
 				IARG_MEMORYOP_EA, memOp,
 				IARG_END);
+			*/
+		
+			cout << "syntax = " <<INS_Disassemble(ins) <<" pc = "<< INS_Address(ins)<<
+				" immediateValue =  "<< INS_OperandImmediate(ins,memOp)<<endl;
 		}
 	}
-	*/
+	
 }
 
 VOID Fini(INT32 code, VOID *v)
