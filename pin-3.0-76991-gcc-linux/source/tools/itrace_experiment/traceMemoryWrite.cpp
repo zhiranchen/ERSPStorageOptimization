@@ -15,11 +15,18 @@
 
 FILE * trace;
 using namespace std;
+
+static INS per_ins;
 // Print a memory write record
 //VOID RecordMemoryWrite(UINT32 insAddr, std::string insDis, UNIT32 memOp)
 //{
 //}
 
+static VOID RecordMemWrite(ADDRINT * ins, UINT32 memOp )
+{
+	cout << "syntax = " <<INS_Disassemble(per_ins) <<" pc = "<< ins<<
+	" immediateValue =  "<< INS_OperandImmediate(per_ins,memOp)<<endl;
+}
 // Is called for every instruction and instruments writes
 VOID Instruction(INS ins, VOID *v)
 {
@@ -37,17 +44,14 @@ VOID Instruction(INS ins, VOID *v)
 		{
 			//ADDRINT value = INS_OperandImmediate(ins,memOp);
 			
-			
-			/*INS_InsertCall(
-				ins, IPOINT_BEFORE,(AFUNPTR)RecordMemoryWrite,
-				IARG_ADDRINT,INS_Address(ins),//Address of instruction
-				IARG_PTR,new string(INS_Diassemble(ins)),//Disassembly type listing of instruction
-				IARG_MEMORYOP_EA, memOp,
+		  	per_ins = ins;	
+			INS_InsertCall(
+				ins, IPOINT_BEFORE,(AFUNPTR)RecordMemWrite,
+				IARG_ADDRINT, INS_Address(ins),//Address of instruction
+				IARG_UINT32, 0,//Disassembly type listing of instruction
 				IARG_END);
-			*/
+					
 		
-			cout << "syntax = " <<INS_Disassemble(ins) <<" pc = "<< INS_Address(ins)<<
-				" immediateValue =  "<< INS_OperandImmediate(ins,memOp)<<endl;
 		}
 	}
 	
