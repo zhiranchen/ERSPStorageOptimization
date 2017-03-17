@@ -15,6 +15,7 @@
 
 FILE * trace;
 using namespace std;
+
 // Print a memory write record
 static VOID RecordMemWrite(INS ins, UINT32 memOp){
 	cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<" immediateValue" <<INS_OperandImmediate(ins,memOp)<<endl;
