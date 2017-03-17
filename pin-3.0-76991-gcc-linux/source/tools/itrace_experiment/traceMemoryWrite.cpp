@@ -17,8 +17,9 @@ FILE * trace;
 using namespace std;
 
 // Print a memory write record
-static VOID RecordMemWrite(INS ins, UINT32 memOp){
-	cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<" immediateValue" <<INS_OperandImmediate(ins,memOp)<<endl;
+static VOID RecordMemWrite(ADDRINT ip, UINT32 memOp, ADDRINT addr){
+	printf("print something\n");
+	/*cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<" immediateValue" <<INS_OperandImmediate(ins,memOp)<<endl;*/
 
 }
 
@@ -45,8 +46,10 @@ VOID Instruction(INS ins, VOID *v)
 				if(INS_OperandIsImmediate(ins, 1)){
 					UINT32 val =  INS_OperandImmediate(ins,1);
 
-					INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemWrite, 
-					 	IARG_INST_PTR, val,
+					INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemWrite,
+						IARG_INST_PTR, 
+					 	IARG_UINT32, val,
+						IARG_MEMORYOP_EA, memOp,
 					   	IARG_END);
 				}
 			}		

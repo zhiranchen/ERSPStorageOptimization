@@ -1,0 +1,2 @@
+Pin 3.0 kit 76887
+E:  traceMemoryWrite.cpp:53: IARG_MEMORYOP_EA/IARG_MEMORYOP_MASKED_ON invalid memory operand index (1) on     37 0x00007f618fb27099 mov qword ptr [rip+0x20cc04], 0x0
