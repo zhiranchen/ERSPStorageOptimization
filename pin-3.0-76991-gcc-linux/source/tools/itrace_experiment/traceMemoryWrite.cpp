@@ -16,9 +16,10 @@
 FILE * trace;
 using namespace std;
 // Print a memory write record
-//VOID RecordMemoryWrite(UINT32 insAddr, std::string insDis, UNIT32 memOp)
-//{
-//}
+static VOID RecordMemWrite(INS ins, UINT32 memOp){
+	cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<" immediateValue" <<INS_OperandImmediate(ins,memOp)<<endl;
+
+}
 
 // Is called for every instruction and instruments writes
 VOID Instruction(INS ins, VOID *v)
@@ -27,27 +28,27 @@ VOID Instruction(INS ins, VOID *v)
 	// the instrumentation is called iff the instruction will actually
 	// be executed.
 
-	UINT32 memOperands = INS_OperandCount(ins);
 
-	// Iterate over each memory operand of the instuction.
-	for(UINT32 memOp = 0; memOp <memOperands; memOp++)
-	{	
-		if(INS_MemoryOperandIsWritten(ins,memOp)&&(INS_OperandIsImmediate(ins, memOp)))
-		//if(INS_OperandIsImmediate(ins,memOp))
+	// Check if the instruction is a data-transfer type instruction
+	if( INS_Category(ins) == XED_CATEGORY_DATAXFER ){
+		UINT32 memOperands = INS_MemoryOperandCount(ins);
+
+
+		// Iterate over each memory operand of the instuction.
+		for(UINT32 memOp = 0; memOp <memOperands; memOp++)
 		{
-			//ADDRINT value = INS_OperandImmediate(ins,memOp);
-			
-			
-			/*INS_InsertCall(
-				ins, IPOINT_BEFORE,(AFUNPTR)RecordMemoryWrite,
-				IARG_ADDRINT,INS_Address(ins),//Address of instruction
-				IARG_PTR,new string(INS_Diassemble(ins)),//Disassembly type listing of instruction
-				IARG_MEMORYOP_EA, memOp,
-				IARG_END);
-			*/
-		
-			cout << "syntax = " <<INS_Disassemble(ins) <<" pc = "<< INS_Address(ins)<<
-				" immediateValue =  "<< INS_OperandImmediate(ins,memOp)<<endl;
+
+			if( INS_MemoryOperandIsWritten(ins, memOp)){
+
+				//check if the operand is immediate
+				if(INS_OperandIsImmediate(ins, 1)){
+					UINT32 val =  INS_OperandImmediate(ins,1);
+
+					INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemWrite, 
+					 	IARG_INST_PTR, val,
+					   	IARG_END);
+				}
+			}		
 		}
 	}
 	
