@@ -18,7 +18,7 @@ using namespace std;
 
 // Print a memory write record
 static VOID RecordMemWrite(ADDRINT ip, UINT32 memOp, ADDRINT addr){
-	printf("print something\n");
+	printf("print\n");
 	/*cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<" immediateValue" <<INS_OperandImmediate(ins,memOp)<<endl;*/
 
 }
