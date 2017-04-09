@@ -47,12 +47,13 @@ VOID Instruction(INS ins, VOID *v)
 
 					UINT32 val =  INS_OperandImmediate(ins,1);
 				
-
-					INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemWrite,
+					if( INS_IsStackWrite(ins) && INS_MemoryWriteSize(ins) == 4){
+					INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemWrite,
 						IARG_INST_PTR, 
 					 	IARG_UINT32, val,
 						IARG_MEMORYOP_EA, memOp,
 					   	IARG_END);
+                                        }
 				}
 			}		
 		}
