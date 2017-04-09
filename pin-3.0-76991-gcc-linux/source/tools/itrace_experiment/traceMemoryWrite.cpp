@@ -17,8 +17,8 @@ FILE * trace;
 using namespace std;
 
 // Print a memory write record
-static VOID RecordMemWrite(ADDRINT ip, UINT32 memOp, ADDRINT addr){
-	printf("print something\n");
+static VOID RecordMemWrite(ADDRINT ip, UINT32 val, ADDRINT memOp){
+	cout << val << endl;
 	/*cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<" immediateValue" <<INS_OperandImmediate(ins,memOp)<<endl;*/
 
 }
@@ -44,7 +44,9 @@ VOID Instruction(INS ins, VOID *v)
 
 				//check if the operand is immediate
 				if(INS_OperandIsImmediate(ins, 1)){
+
 					UINT32 val =  INS_OperandImmediate(ins,1);
+				
 
 					INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemWrite,
 						IARG_INST_PTR, 
