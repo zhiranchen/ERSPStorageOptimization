@@ -13,12 +13,18 @@
 #include <stdio.h>
 #include "pin.H"
 
+#include <bits/stdc++.h>
 FILE * trace;
 using namespace std;
 
+
 // Print a memory write record
 static VOID RecordMemWrite(ADDRINT ip, UINT32 val, ADDRINT memOp){
-	cout << val << endl;
+
+	ofstream myfile;
+	myfile.open( "output.txt", ios::app);
+	myfile << val << endl;
+
 	/*cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<" immediateValue" <<INS_OperandImmediate(ins,memOp)<<endl;*/
 
 }
