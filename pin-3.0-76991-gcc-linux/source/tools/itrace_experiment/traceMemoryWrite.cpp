@@ -12,11 +12,12 @@
 #include <iostream>
 #include <stdio.h>
 #include "pin.H"
+#include <fstream>
+#include <cassert>
 
 #include <bits/stdc++.h>
 FILE * trace;
 using namespace std;
-
 
 // Print a memory write record
 static VOID RecordMemWrite(ADDRINT ip, UINT32 val, ADDRINT memOp){
@@ -24,9 +25,16 @@ static VOID RecordMemWrite(ADDRINT ip, UINT32 val, ADDRINT memOp){
 	ofstream myfile;
 	myfile.open( "output.txt", ios::app);
 	myfile << val << endl;
-
 	/*cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<" immediateValue" <<INS_OperandImmediate(ins,memOp)<<endl;*/
 
+}
+static void printRegVal(const CONTEXT * ctxt){
+	for(int reg = (int)REG_GR_BASE;reg<=(int)REG_GR_LAST;++reg){
+		ADDRINT val;
+		PIN_GetContextRegval(ctxt,(REG)reg,reinterpret_cast<UINT8*>(&val));
+		if(val==22222)
+			cout<<"here"<<val<<endl;
+	}
 }
 
 // Is called for every instruction and instruments writes
@@ -52,20 +60,21 @@ VOID Instruction(INS ins, VOID *v)
 				if(INS_OperandIsImmediate(ins, 1)){
 
 					UINT32 val =  INS_OperandImmediate(ins,1);
-				
+
 					if( INS_IsStackWrite(ins) && INS_MemoryWriteSize(ins) == 4){
-					INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemWrite,
-						IARG_INST_PTR, 
-					 	IARG_UINT32, val,
-						IARG_MEMORYOP_EA, memOp,
-					   	IARG_END);
-                                        }
+						INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemWrite,
+								IARG_INST_PTR, 
+								IARG_UINT32, val,
+								IARG_MEMORYOP_EA, memOp,
+								IARG_END);
+					}
 				}
 			}		
 		}
-	}
-	
+		INS_InsertPredicatedCall(ins,IPOINT_BEFORE,(AFUNPTR)printRegVal,IARG_CONST_CONTEXT,IARG_END);
+	}	
 }
+
 
 VOID Fini(INT32 code, VOID *v)
 {
@@ -76,7 +85,7 @@ VOID Fini(INT32 code, VOID *v)
 INT32 Usage()
 {
 	PIN_ERROR("This Pintool prints a trace of memory address\n"
-		+ KNOB_BASE::StringKnobSummary()+"\n");
+			+ KNOB_BASE::StringKnobSummary()+"\n");
 	return -1;
 }
 
@@ -89,15 +98,15 @@ int main(int argc, char *argv[])
 {
 	if (PIN_Init(argc, argv)) return Usage();
 
-    trace = fopen("traceMemoryWrite.out", "w");
+	trace = fopen("traceMemoryWrite.out", "w");
 
-    INS_AddInstrumentFunction(Instruction, 0);
-    PIN_AddFiniFunction(Fini, 0);
+	INS_AddInstrumentFunction(Instruction, 0);
+	PIN_AddFiniFunction(Fini, 0);
 
-    // Never returns
-    PIN_StartProgram();
+	// Never returns
+	PIN_StartProgram();
 
-    return 0;
+	return 0;
 
 }
 

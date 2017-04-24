@@ -6,9 +6,9 @@
 
 void foo()
 {
-  int a = 222222;
+  int a = 22222;
 
-  a = 111111;
+//  a = 111111;
   int c=a;
   a= a+1;
   //c=c+1
@@ -31,10 +31,11 @@ int main(int ac, char **av)
   myFile = fopen("output.txt", "w");
  
   foo();
-
+/*
   myFile = fopen("output.txt", "a");
   for(int j=0; j < 10; j++){
      fprintf(myFile, "%d\n", end = 301 + j);
   }
-  fclose(myFile);
+  fclose(myFile);*/
+
 }
