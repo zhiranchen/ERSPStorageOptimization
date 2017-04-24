@@ -28,13 +28,14 @@ static VOID RecordMemWrite(ADDRINT ip, UINT32 val, ADDRINT memOp){
 	/*cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<" immediateValue" <<INS_OperandImmediate(ins,memOp)<<endl;*/
 
 }
-static void printRegVal(const CONTEXT * ctxt){
-	for(int reg = (int)REG_GR_BASE;reg<=(int)REG_GR_LAST;++reg){
-		ADDRINT val;
-		PIN_GetContextRegval(ctxt,(REG)reg,reinterpret_cast<UINT8*>(&val));
-		if(val==22222)
-			cout<<"here"<<val<<endl;
-	}
+static void printRegVal(INS ins){
+                REG regVal;
+		//val = PIN_GetContextRegval(ctxt,(REG)reg,reinterpret_cast<UINT8*>(&val));
+                const UINT32 max = INS_MaxNumRRegs(ins);
+                for( UINT i = 0; i < max; i++){
+                  regVal = INS_RegR(ins,i);
+		  cout<<"here"<<( * regVal)<<endl;
+                }
 }
 
 // Is called for every instruction and instruments writes
@@ -71,7 +72,7 @@ VOID Instruction(INS ins, VOID *v)
 				}
 			}		
 		}
-		INS_InsertPredicatedCall(ins,IPOINT_BEFORE,(AFUNPTR)printRegVal,IARG_CONST_CONTEXT,IARG_END);
+		INS_InsertPredicatedCall(ins,IPOINT_BEFORE,(AFUNPTR)printRegVal,ins,IARG_END);
 	}	
 }
 
