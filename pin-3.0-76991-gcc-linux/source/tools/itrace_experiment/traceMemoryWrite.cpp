@@ -28,14 +28,14 @@ static VOID RecordMemWrite(ADDRINT ip, UINT32 val, ADDRINT memOp){
 	/*cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<" immediateValue" <<INS_OperandImmediate(ins,memOp)<<endl;*/
 
 }
-static void printRegVal(INS ins){
-                REG regVal;
+static void printRegVal(ADDRINT ip, REG* reg_r,ADDRINT addr){
 		//val = PIN_GetContextRegval(ctxt,(REG)reg,reinterpret_cast<UINT8*>(&val));
-                const UINT32 max = INS_MaxNumRRegs(ins);
+                /*const UINT32 max = INS_MaxNumRRegs(ins);
                 for( UINT i = 0; i < max; i++){
                   regVal = INS_RegR(ins,i);
 		  cout<<"here"<<( * regVal)<<endl;
-                }
+                }*/
+               cout<<"here"<< *reg_r<<endl;
 }
 
 // Is called for every instruction and instruments writes
@@ -56,7 +56,13 @@ VOID Instruction(INS ins, VOID *v)
 		{
 
 			if( INS_MemoryOperandIsWritten(ins, memOp)){
-
+                           if(INS_OperandIsReg(ins,1)){
+                              const UINT32 max = INS_MaxNumRRegs(ins);
+                              for(UINT i = 0; i <max ; i++){
+                if(REG_is_gr(INS_RegR(ins,i))
+		INS_InsertPredicatedCall(ins,IPOINT_BEFORE,(AFUNPTR)printRegVal,IARG_INST_PTR,IARG_REG_REFERENCE,INS_RegR(ins,i),IARG_MEMORYWRITE_EA,IARG_END);
+}
+}
 				//check if the operand is immediate
 				if(INS_OperandIsImmediate(ins, 1)){
 
@@ -72,7 +78,7 @@ VOID Instruction(INS ins, VOID *v)
 				}
 			}		
 		}
-		INS_InsertPredicatedCall(ins,IPOINT_BEFORE,(AFUNPTR)printRegVal,ins,IARG_END);
+		//INS_InsertPredicatedCall(ins,IPOINT_BEFORE,(AFUNPTR)printRegVal,IARG_INST_PTR,IARG_REG_REFERENCE,INS_RegR(ins,0),IARG_MEMORYWRITE_EA,IARG_END);
 	}	
 }
 
