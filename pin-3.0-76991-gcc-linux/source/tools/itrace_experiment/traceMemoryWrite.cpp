@@ -59,10 +59,13 @@ VOID Instruction(INS ins, VOID *v)
                            if(INS_OperandIsReg(ins,1)){
                               const UINT32 max = INS_MaxNumRRegs(ins);
                               for(UINT i = 0; i <max ; i++){
-                if(REG_is_gr(INS_RegR(ins,i))
-		INS_InsertPredicatedCall(ins,IPOINT_BEFORE,(AFUNPTR)printRegVal,IARG_INST_PTR,IARG_REG_REFERENCE,INS_RegR(ins,i),IARG_MEMORYWRITE_EA,IARG_END);
-}
-}
+                		if(REG_is_gr(INS_RegR(ins,i))){
+					INS_InsertPredicatedCall(ins,IPOINT_BEFORE,(AFUNPTR)printRegVal,
+					IARG_INST_PTR,IARG_REG_REFERENCE,INS_RegR(ins,i),
+					IARG_MEMORYWRITE_EA,IARG_END);
+				}
+			      }
+			   }
 				//check if the operand is immediate
 				if(INS_OperandIsImmediate(ins, 1)){
 
