@@ -22,8 +22,8 @@ using namespace std;
 // Print a memory write record
 static VOID RecordMemWrite(ADDRINT ip, UINT32 val, ADDRINT memOp){
   ofstream myfile;
-  myfile.open( "output.txt", ios::app);
-  myfile << val << endl;
+  myfile.open( "ImmediateOutput.txt", ios::app);
+  myfile << "IP:"<<ip<<"\t\t Immediate Value: "<< val << endl;
   /*cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<" immediateValue" <<INS_OperandImmediate(ins,memOp)<<endl;*/
 }
 
@@ -37,8 +37,9 @@ static void printRegVal(ADDRINT ip, REG* reg_r,ADDRINT addr){
     cout<<"here"<<( * regVal)<<endl;
   }
   */
-               
-  cout<<"here reg value: "<< *reg_r<<endl;
+  ofstream myfile;
+  myfile.open("RegisterOutput.txt",ios::app);
+  myfile << "IP:"<<ip<<"\t\t Register Value: " << *reg_r<<endl;
 }
 
 // Is called for every instruction and instruments writes
@@ -57,7 +58,7 @@ VOID Instruction(INS ins, VOID *v)
     {
       // First check if the memory operand is written
       if(INS_MemoryOperandIsWritten(ins, memOp)){
-        // Check operand is reg
+        // Check if the store instruction is a register to memory store
         if(INS_OperandIsReg(ins,1)){
           const UINT32 max = INS_MaxNumRRegs(ins);
           for(UINT i = 0; i <max ; i++){
@@ -68,8 +69,8 @@ VOID Instruction(INS ins, VOID *v)
 	    }
           }
         }
-	//check if the operand is immediate
-	if(INS_OperandIsImmediate(ins, 1)){
+	//check if the store instruction is an immediate value to memory store
+	else if(INS_OperandIsImmediate(ins, 1)){
           UINT32 val =  INS_OperandImmediate(ins,1);
           if(INS_IsStackWrite(ins) && INS_MemoryWriteSize(ins) == 4){
 	    INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemWrite,
