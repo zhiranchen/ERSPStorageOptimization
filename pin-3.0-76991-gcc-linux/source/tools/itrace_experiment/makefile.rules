@@ -38,13 +38,13 @@ SA_TOOL_ROOTS :=
 APP_ROOTS :=
 
 # This defines any additional object files that need to be compiled.
-OBJECT_ROOTS :=
+OBJECT_ROOTS := 
 
 # This defines any additional dlls (shared objects), other than the pintools, that need to be compiled.
 DLL_ROOTS :=
 
 # This defines any static libraries (archives), that need to be built.
-LIB_ROOTS :=
+LIB_ROOTS := 
 
 ###### Define the sanity subset ######
 
@@ -71,4 +71,4 @@ SANITY_SUBSET := $(TEST_TOOL_ROOTS) $(TEST_ROOTS)
 ##############################################################
 
 # This section contains the build rules for all binaries that have special build rules.
-# See makefile.default.rules for the default build rules.
+# See makefile.default.rules for the default build rules.i

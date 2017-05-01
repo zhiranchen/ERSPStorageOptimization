@@ -14,7 +14,7 @@
 #include "pin.H"
 #include <fstream>
 #include <cassert>
-
+#include "../Utils/regvalue_utils.h"
 #include <bits/stdc++.h>
 FILE * trace;
 using namespace std;
@@ -37,6 +37,10 @@ static void printRegVal(ADDRINT ip, REG* reg_r,ADDRINT addr){
     cout<<"here"<<( * regVal)<<endl;
   }
   */
+ // cout<<"RegVal size: "<<PIN_GetRegvalSize(*reg_r)<<endl; this line results in a compiler error, REGVAL not defined
+  
+  cout<<"RegVal size: "<<REG_Size(*reg_r)<<endl; //This line leads to a coredump
+  //cout<<"Regval Size: "<<sizeof(*reg_r)<<endl;
   ofstream myfile;
   myfile.open("RegisterOutput.txt",ios::app);
   myfile << "IP:"<<ip<<"\t\t Register Value: " << *reg_r<<endl;
@@ -63,6 +67,7 @@ VOID Instruction(INS ins, VOID *v)
           const UINT32 max = INS_MaxNumRRegs(ins);
           for(UINT i = 0; i <max ; i++){
             if(REG_is_gr(INS_RegR(ins,i))){
+              //cout<<"RegVal size: "<<PIN_GetRegvalSize(*INS_RegR(ins,i))<<endl;
               INS_InsertPredicatedCall(ins,IPOINT_BEFORE,(AFUNPTR)printRegVal,
                                        IARG_INST_PTR,IARG_REG_REFERENCE,INS_RegR(ins,i),
                                        IARG_MEMORYWRITE_EA,IARG_END);
