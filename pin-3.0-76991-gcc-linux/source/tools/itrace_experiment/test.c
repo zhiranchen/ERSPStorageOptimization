@@ -8,8 +8,10 @@ void foo()
 {
   int a = 22222;
 
-//  a = 111111;
-  int c=a;
+  double b = 2.23;
+  char c = 'c';
+  short s = 23;
+  //int c = a;
   a= a+1;
   //c=c+1
 
@@ -20,16 +22,15 @@ int main(int ac, char **av)
 
   FILE * myFile;
 
-  myFile = fopen("output.txt", "a");
+ /* myFile = fopen("ImmediateOutput.txt", "a");
   int start;
-  int end;
   for(int i = 0; i < 10; i++){
     fprintf(myFile, "%d\n", start = 201 + i);
   }
   fclose(myFile);
-
-  myFile = fopen("output.txt", "w");
- 
+*/
+  myFile = fopen("RegisterOutput.txt", "w");
+  myFile = fopen("ImmediateOutput.txt", "w");
   foo();
 /*
   myFile = fopen("output.txt", "a");

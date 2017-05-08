@@ -39,7 +39,7 @@ static void printRegVal(ADDRINT ip, REG* reg_r,ADDRINT addr){
   */
  // cout<<"RegVal size: "<<PIN_GetRegvalSize(*reg_r)<<endl; this line results in a compiler error, REGVAL not defined
   
-  cout<<"RegVal size: "<<REG_Size(*reg_r)<<endl; //This line leads to a coredump
+//  cout<<"RegVal size: "<<REG_Size(*reg_r)<<endl; //This line leads to a coredump
   //cout<<"Regval Size: "<<sizeof(*reg_r)<<endl;
   ofstream myfile;
   myfile.open("RegisterOutput.txt",ios::app);
@@ -77,7 +77,7 @@ VOID Instruction(INS ins, VOID *v)
 	//check if the store instruction is an immediate value to memory store
 	else if(INS_OperandIsImmediate(ins, 1)){
           UINT32 val =  INS_OperandImmediate(ins,1);
-          if(INS_IsStackWrite(ins) && INS_MemoryWriteSize(ins) == 4){
+          if(INS_IsStackWrite(ins) ){
 	    INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemWrite,
                                      IARG_INST_PTR, IARG_UINT32, val,
                                      IARG_MEMORYOP_EA, memOp,IARG_END);
