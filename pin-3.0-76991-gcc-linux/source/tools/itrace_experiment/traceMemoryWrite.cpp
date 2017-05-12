@@ -23,8 +23,9 @@ using namespace std;
 static VOID RecordMemWrite(ADDRINT ip, UINT32 val, ADDRINT memOp){
   ofstream myfile;
   myfile.open( "ImmediateOutput.txt", ios::app);
-  myfile << "IP:"<<ip<<"\t\t Immediate Value: "<< val << endl;
-  /*cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<" immediateValue" <<INS_OperandImmediate(ins,memOp)<<endl;*/
+  myfile << "IP:"<<ip<<"\t\tMemory Add: "<<memOp<<"\t\t Immediate Value: "<< val << endl;
+  //cout << "syntax = " <<INS_Disassemble(ins) << " pc = "<< INS_Address(ins)<<" immediateValue" <<INS_OperandImmediate(ins,memOp)<<endl;
+  //cout<<"double: "<<sizeof(double)<<"float: "<<sizeof(float)<<"char: "<<sizeof(char)<<"int: "<<sizeof(int);
 }
 
 // Print register value
@@ -39,11 +40,12 @@ static void printRegVal(ADDRINT ip, REG* reg_r,ADDRINT addr){
   */
  // cout<<"RegVal size: "<<PIN_GetRegvalSize(*reg_r)<<endl; this line results in a compiler error, REGVAL not defined
   
-  cout<<"RegVal size: "<<REG_Size(*reg_r)<<endl; //This line leads to a coredump
+  //cout<<"RegVal size: "<<REG_Size(*reg_r)<<endl; //This line leads to a coredump
+  
   //cout<<"Regval Size: "<<sizeof(*reg_r)<<endl;
   ofstream myfile;
-  myfile.open("RegisterOutput.txt",ios::app);
-  myfile << "IP:"<<ip<<"\t\t Register Value: " << *reg_r<<endl;
+  myfile.open("ImmediateOutput.txt",ios::app);
+  myfile << "IP:"<<ip<<"\t\tMemory Add: "<<addr<<"\t\tMemory Add value: "<<*addr<<"\t\t Register Value: " << *reg_r<<endl;
 }
 
 // Is called for every instruction and instruments writes
@@ -53,11 +55,11 @@ VOID Instruction(INS ins, VOID *v)
   // the instrumentation is called iff the instruction will actually
   // be executed.
 
-
   // Check if the instruction is a data-transfer type instruction
   if( INS_Category(ins) == XED_CATEGORY_DATAXFER ){
     UINT32 memOperands = INS_MemoryOperandCount(ins);
-    // Iterate over each memory operand of the instuction.
+    // Iterate over each memory operand of the instuction.i
+
     for(UINT32 memOp = 0; memOp <memOperands; memOp++)
     {
       // First check if the memory operand is written
@@ -67,7 +69,13 @@ VOID Instruction(INS ins, VOID *v)
           const UINT32 max = INS_MaxNumRRegs(ins);
           for(UINT i = 0; i <max ; i++){
             if(REG_is_gr(INS_RegR(ins,i))){
+              //cout<<"Register size: "<<REG_Size(INS_RegR(ins,i))<<endl;
+              //cout<<"Register store sytax:"<<INS_Disassemble(ins)<<"\t Register size: "<<INS_RegR(ins,i)<<endl;
               //cout<<"RegVal size: "<<PIN_GetRegvalSize(*INS_RegR(ins,i))<<endl;
+              //if(REG_Size(INS_RegR(ins,i)) == 4)
+              //{
+              //  INS_InsertPredicatedCall(ins,IPOINT_BEFORE,(A
+              //}
               INS_InsertPredicatedCall(ins,IPOINT_BEFORE,(AFUNPTR)printRegVal,
                                        IARG_INST_PTR,IARG_REG_REFERENCE,INS_RegR(ins,i),
                                        IARG_MEMORYWRITE_EA,IARG_END);
@@ -77,8 +85,11 @@ VOID Instruction(INS ins, VOID *v)
 	//check if the store instruction is an immediate value to memory store
 	else if(INS_OperandIsImmediate(ins, 1)){
           UINT32 val =  INS_OperandImmediate(ins,1);
-          if(INS_IsStackWrite(ins) && INS_MemoryWriteSize(ins) == 4){
-	    INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemWrite,
+          if(INS_IsStackWrite(ins) && INS_MemoryWriteSize(ins) <= 24){
+	    
+            cout<<INS_Disassemble(ins)<<"Immediate Value: "<<val<<endl;
+            cout<<val<<endl;
+            INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemWrite,
                                      IARG_INST_PTR, IARG_UINT32, val,
                                      IARG_MEMORYOP_EA, memOp,IARG_END);
 	  }
