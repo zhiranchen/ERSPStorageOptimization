@@ -25,9 +25,34 @@ static void RecordMemWrite(ADDRINT ip, UINT32 val, ADDRINT memOp){
   fprintf( myfile, "IP: %ld ImVal %d MemOp %ld\n", ip, val, memOp );
 }
 
+
 // Print register value
-static void printRegVal(ADDRINT ip, REG* reg_r){
-  fprintf( myfile, "Address: %ld Register: %d\n", ip, *reg_r);  
+static void printRegVal( ADDRINT ip, REG* reg_r){
+  fprintf( myfile, "Address: %ld Register: %d\n", ip, *reg_r );
+}
+
+//Print register value double
+/*static void printRegVal_double(ADDRINT ip, REG* reg_r, CONTEXT * ctxt){
+
+  static const UINT stRegSize = REG_Size(REG_ST_BASE);
+  for( int reg = (int) REG_GR_BASE; reg <= (int) REG_GR_LAST; ++reg ){
+    ADDRINT val;
+    PIN_GetContextRegval(ctxt, (REG) reg, reinterpret_cast<UINT8*>(&val));
+    cout << REG_StringShort((REG)reg) << ": " << Val2Str(&val, stRegSize ) << endl;
+  }
+    
+}*/
+
+static void printRegVal_integer(ADDRINT ip, const CONTEXT * ctxt ){
+
+  //static const UINT stRegSize = REG_SIZE(REG_ST_BASE);
+  for( int reg = (int) REG_GR_BASE; reg <= (int) REG_GR_LAST; ++reg ){
+    ADDRINT val;
+    PIN_GetContextRegval(ctxt, (REG) reg, reinterpret_cast<UINT8*>(&val));
+    cout <<"&&&&&&&&&&&&&&&&&&&&&&&&&get context int" << val << endl;
+
+  }
+
 }
 
 // Is called for every instruction and instruments writes
@@ -60,13 +85,32 @@ VOID Instruction(INS ins, VOID *v)
                       && INS_Disassemble(ins).std::string::find("movsd qword ptr") 
                          != std::string::npos){
               cout << "Double" << endl;
-          }
-        }
+  //            INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) printRegVal_double,
+    //                                   IARG_INST_PTR, IARG_CONST_CONTEXT, IARG_END);
+
+            // Check if an integer is stored
+            }else if( REG_is_gr(INS_RegR(ins,0)) && REG_is_fr(INS_RegR(ins, 1))
+                      && INS_Disassemble(ins).std::string::find("mov dword ptr" )
+                         != std::string::npos){
+
+              cout << INS_Disassemble(ins) << "Integer register operation ========" << endl;
+              INS_InsertPredicatedCall( ins, IPOINT_BEFORE, (AFUNPTR) printRegVal_integer,
+                                          IARG_INST_PTR, IARG_CONST_CONTEXT, IARG_END);
+
+            // Check if char is stored
+            }else if( REG_is_gr(INS_RegR(ins,0)) && REG_is_fr(INS_RegR(ins, 1))
+                      && INS_Disassemble(ins).std::string::find("mov byte ptr" )
+                         != std::string::npos){
+              cout <<INS_Disassemble(ins) << "Reg is char" << endl;
+           
+            }
+         }
 
 	//check if the store instruction is an immediate value to memory store
 	else if(INS_OperandIsImmediate(ins, 1)){
           UINT32 val =  INS_OperandImmediate(ins,1);
           if(INS_IsStackWrite(ins) && INS_MemoryWriteSize(ins) <= 24){
+            cout << INS_Disassemble(ins) << "\t Immediate value" <<"\t" <<val<<"*************************"<<endl;
             INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemWrite,
                                      IARG_INST_PTR, IARG_UINT32, val,
                                      IARG_MEMORYOP_EA, memOp,IARG_END);
@@ -76,7 +120,6 @@ VOID Instruction(INS ins, VOID *v)
     }
   }	
 }
-
 
 VOID Fini(INT32 code, VOID *v)
 {
