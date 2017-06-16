@@ -1,0 +1,22 @@
+ERSP Storage Optimization
+
+This pin tool is written to identify redundant store instructions. To run this
+program, navigate to the itrace_experiment directory. Then type in 'make'. Next,
+to run the pin program, type in:
+
+pin -t ~/ERSPStorageOptimization/pin-3.0-76991-gcc-linux/source/tools/itrace_ex
+periment/obj-intel64/traceMemoryWrite.so -- ./test
+
+where test is the C or C++ program you wish to find the redundant store
+instructions.
+
+If there are any problems running this, you might not have configured Pin
+correctly on your device. Please refer to the Pin website to configure 
+correctly.
+
+Currently, the program prints all the immediate values and register values to
+ImmediateOutput.txt. It includes the immediate value, instructor pointers, and
+memory address. 
+
+A tool to remove these redundant store instructions can be written to actually 
+remove the store instructions and optimize the program.
